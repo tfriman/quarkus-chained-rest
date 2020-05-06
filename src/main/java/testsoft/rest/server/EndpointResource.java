@@ -36,8 +36,12 @@ public class EndpointResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String name() {
-        return "[" + time() + "] host:" + host + " called\n" + restClientService.getTimestamp();
+        long start = time();
+        String response = restClientService.callNext();
+        long diff = time() - start;
+        return "[" + diff + "] host:" + host + " called\n" + response;
     }
+
 
     @GET
     @Path("/timestamp")

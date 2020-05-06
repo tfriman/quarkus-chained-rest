@@ -8,11 +8,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("")
-@RegisterRestClient()
+@RegisterRestClient(configKey = "target")
 public interface RestClientService {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    String getTimestamp();
+    String callNext();
 
 }
