@@ -8,9 +8,23 @@ Chains / calls to target url. Second to last in chain should call last's /timest
 
 # Building and running locally
 
+## JVM version
 ```shell script
-docker build -f src/main/docker/Dockerfile.native -t quarkus/chained-rest-caller .
+mvn clean package
 
+docker build -f src/main/docker/Dockerfile.jvm -t quarkus/chained-rest-caller .
+
+```
+## Native
+
+```shell script
+mvn clean package -Pnative -Dquarkus.native.container-build=true 
+
+docker build -f src/main/docker/Dockerfile.native -t quarkus/chained-rest-caller .
+```
+
+## Running 
+```
 docker run -i --rm -p 9001:8080 --name second \
        -e  target/mp-rest/url=http://second:8080/timestamp \
        quarkus/chained-rest-caller
@@ -27,7 +41,7 @@ curl localhost:9000
 
 # Pushing to Quay
 
-```
+```shell script
 docker login quay.io
 
 docker tag quarkus/chained-rest-caller quay.io/tfriman/chained-rest-caller
@@ -36,9 +50,9 @@ docker push quay.io/tfriman/chained-rest-caller
 
 # Usage with OpenShift
 ```shell script
-oc new-app --name third quay.io/tfriman/chained-rest-caller -e "TARGET_MP_REST_URL=http://third:8080/timestamp"
-oc new-app --name second quay.io/tfriman/chained-rest-caller -e "TARGET_MP_REST_URL=http://third:8080/timestamp"
-oc new-app --name first  quay.io/tfriman/chained-rest-caller -e "TARGET_MP_REST_URL=http://second:8080/"
+oc new-app --name third quay.io/tfriman/chained-rest-caller:modified -e "TARGET_MP_REST_URL=http://third:8080/timestamp"
+oc new-app --name second quay.io/tfriman/chained-rest-caller:modified -e "TARGET_MP_REST_URL=http://third:8080/timestamp"
+oc new-app --name first  quay.io/tfriman/chained-rest-caller:modified -e "TARGET_MP_REST_URL=http://second:8080/"
 
 oc expose svc/first
 oc patch route/first -p '{"spec":{"tls": {"insecureEdgeTerminationPolicy":"Allow"}}}'

@@ -1,6 +1,9 @@
 package testsoft.rest.server;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import testsoft.rest.client.RestClientService;
 
 import javax.inject.Inject;
@@ -15,6 +18,7 @@ import java.net.UnknownHostException;
 public class EndpointResource {
 
     private static String host;
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointResource.class);
 
     static {
         try {
@@ -23,6 +27,9 @@ public class EndpointResource {
             e.printStackTrace();
         }
     }
+
+    @ConfigProperty(name = "target/mp-rest/url")
+    String nextUrl;
 
     @Inject
     @RestClient
@@ -36,6 +43,7 @@ public class EndpointResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String name() {
+        LOG.info("name() called, next url {}", nextUrl);
         long start = time();
         String response = restClientService.callNext();
         long diff = time() - start;
@@ -47,6 +55,7 @@ public class EndpointResource {
     @Path("/timestamp")
     @Produces(MediaType.TEXT_PLAIN)
     public String timestamp() {
+        LOG.info("timestamp() called");
         return "[" + time() + "] host:" + host;
     }
 
