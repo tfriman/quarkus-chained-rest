@@ -31,13 +31,15 @@ public class EndpointResource {
     @ConfigProperty(name = "target/mp-rest/url")
     String nextUrl;
 
+    @ConfigProperty(name = "deployment.identifier")
+    String deploymentIdentifier;
+
     @Inject
     @RestClient
     RestClientService restClientService;
 
     private Long time() {
         return System.currentTimeMillis();
-        //return System.nanoTime();
     }
 
     @GET
@@ -47,7 +49,7 @@ public class EndpointResource {
         long start = time();
         String response = restClientService.callNext();
         long diff = time() - start;
-        return "[" + diff + "] host:" + host + " called\n" + response;
+        return deploymentIdentifier + " [" + diff + "] host:" + host + " called\n" + response;
     }
 
 
@@ -56,7 +58,7 @@ public class EndpointResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String timestamp() {
         LOG.info("timestamp() called");
-        return "[" + time() + "] host:" + host;
+        return "[" + time() + "] host:" + host + " deployment:" + deploymentIdentifier;
     }
 
 }
